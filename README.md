@@ -43,3 +43,46 @@ Here we need to look at the value of `MSC_SCAN` and as you can see the value of 
 #### 3. Find the right keycode
 
 So we already know the right **scancode** and the next step is to find the right **keycode**. A better way is to look at the default Linux **keycodes** in the `/usr/include/linux/input-event-codes.h` file. Here we have to look at the `KEY_*` definitions and for our example the variants are: `KEY_MENU`, `KEY_CONTEXT_MENU`, `KEY_ROOT_MENU`, `KEY_MEDIA_TOP_MENU`, `KEY_BRIGHTNESS_MENU`, `KEY_KBD_LCD_MENU1`, `KEY_KBD_LCD_MENU2`, `KEY_KBD_LCD_MENU3`, `KEY_KBD_LCD_MENU4` and `KEY_KBD_LCD_MENU5`. The `KEY_MENU` and `KEY_CONTEXT_MENU` **keycodes** look right ones, but we can be determine which one will work by trying them. In order, not to waste time the right **keycode** for our example is `KEY_MENU`.
+
+#### 4. Get the right device ID
+
+Ok, we know the **scancode** and what the **keycode** to map it to, and the mapping is best done for a specific device, but not for all, so we need to find the ID of the input device. There are two options: the kernel **modalias** and the device name with DMI:
+1. We can find **modalias** in the **sysfs** input directory:
+```
+$ cat /sys/class/input/event4/device/modalias
+```
+The output for this example will be:
+```
+input:b0019v17AAp5054e4101-e0,1,4,5,k71,72,73,78,8C,8E,90,93,94,95,98,9C,9E,AB,AD,BE,BF,C2,CA,CB,CD,D4,D8,D9,DA,DF,E0,E1,E3,E4,EC,ED,EE,F0,168,174,176,1D2,1DB,1DC,246,250,27A,ram4,lsfw3,
+```
+which we can shorten to:
+```
+input:b0019v17AAp5054e4101*
+```
+2. For the second option, we can also find in the `/sys/class/input/event4/device/name` and `/sys/devices/virtual/dmi/id/modalias`, but it's better to use `evemu-describe` command from the `evemu` package:
+```
+# evemu-describe /dev/input/event4
+```
+From the output, we need to look at the **DMI** and **Input device name** rows and concatenate them into a string:
+```
+name:ThinkPad Extra Buttons:dmi:bvnLENOVO:bvrN3MET09W(1.06):bd10/11/2022:br1.6:efr1.12:svnLENOVO:pn21AH00B9RA:pvrThinkPadT14Gen3:rvnLENOVO:rn21AH00B9RA:rvrNotDefined:cvnLENOVO:ct10:cvrNone:skuLENOVO_MT_21AH_BU_Think_FM_ThinkPadT14Gen3:
+```
+which we can shorten to:
+```
+name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*
+```
+Before moving to the next step, it's best to check the default **keycode** mapping for availability of the required input device and use that ID, as the option from the default mapping might intefere with your option. The default **keycode** mappings are defined in `/usr/lib/udev/hwdb.d/60-keyboard.hwdb`. And for our example there is a default mapping:
+```
+...
+###########################################################
+# Lenovo
+###########################################################
+
+# thinkpad_acpi driver
+evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*
+ KEYBOARD_KEY_01=screenlock
+...
+ KEYBOARD_KEY_46=prog2                                  # Fn + PrtSc, on Windows: Snipping tool
+...
+```
+Therefore, it's better to use the `name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*` ID instead of `input:b0019v17AAp5054e4101*`.
