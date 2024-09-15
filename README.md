@@ -86,3 +86,21 @@ evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*
 ...
 ```
 Therefore, it's better to use the `name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*` ID instead of `input:b0019v17AAp5054e4101*`.
+
+#### 5. Create a file for the hardware database
+
+Finally, we can create a file with our mapping. Each map consists of a pair: `KEYBOARD_KEY_` + **scancode** and **keycode** in lowercase:
+```
+KEYBOARD_KEY_46=menu
+```
+And with the input ID our file will looks like this:
+```
+evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*
+ KEYBOARD_KEY_46=menu
+```
+> Note that before the input ID should be the `evdev:` prefix.
+So we can create a file for the hardware database with this command:
+```
+# echo -e 'evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*\n KEYBOARD_KEY_46=menu' > /etc/udev/hwdb.d/90-remap.hwdb
+```
+> Note that the file name doesn't matter, but the number at beggining of the file name must be greater than the number of all `.hwdb` files that have mappings for the input device.
