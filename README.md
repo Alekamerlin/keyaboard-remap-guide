@@ -104,3 +104,14 @@ So we can create a file for the hardware database with this command:
 # echo -e 'evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*\n KEYBOARD_KEY_46=menu' > /etc/udev/hwdb.d/90-remap.hwdb
 ```
 > Note that the file name doesn't matter, but the number at beggining of the file name must be greater than the number of all `.hwdb` files that have mappings for the input device.
+
+#### 6. Apply the changes
+
+After creating a file with the remap, we need to update the Hardware Database Index:
+```
+# systemd-hwdb update
+```
+and reload it:
+```
+# udevadm trigger
+```
