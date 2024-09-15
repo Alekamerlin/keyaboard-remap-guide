@@ -12,3 +12,7 @@ Before begin, it's better to explore these resources:
 - How to map [**scancodes** to **keycodes**](https://wiki.archlinux.org/title/Map_scancodes_to_keycodes).
 
 In short, keyboards send **scancodes** to the computer and the Linux kernel maps the **scancodes** to **keycodes**. The **keycodes** are some interpretation of **scancodes**. They exist because different keyboards can send different **scancodes** to the same button, or the same **scancode** to different buttons. On a ThinkPad keyboard, the screenshot tool button sends a **scancode** of 46, while the `Q` button sends the same **scancode**, for example.
+
+### A step-by-step example
+
+So in this guide we will map **scancodes** to **keycodes** using **udev**. We will take a ThinkPad T14 Gen 3 and map `Fn + PrtScr` to the `Menu` **keycode** so that this combination opens a context menu.
