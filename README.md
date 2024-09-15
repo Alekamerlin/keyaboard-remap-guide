@@ -115,3 +115,19 @@ and reload it:
 ```
 # udevadm trigger
 ```
+
+#### 7. Check if the changes have been applied
+
+Now we can check if our remap is applied:
+```
+# udevadm info /dev/input/event4 | grep KEYBOARD_KEY
+```
+The output should have our remap:
+```
+...
+E: KEYBOARD_KEY_46=menu
+...
+```
+We can also check the remap using the `evtest` utility.
+
+Next, it's best to reboot the system because X11 and Wayland may not see you changes until the reboot. After rebooting, it's best to check the remap in [`xev`](https://archlinux.org/packages/extra/x86_64/xorg-xev/) for X11 or [`wev`](https://archlinux.org/packages/extra/x86_64/wev/) for Wayland, because display servers have their own understanding of **keycodes**, and things can go wrong.
