@@ -16,3 +16,13 @@ In short, keyboards send **scancodes** to the computer and the Linux kernel maps
 ### A step-by-step example
 
 So in this guide we will map **scancodes** to **keycodes** using **udev**. We will take a ThinkPad T14 Gen 3 and map `Fn + PrtScr` to the `Menu` **keycode** so that this combination opens a context menu.
+
+#### 1. Find the right input device
+
+First we should select the input device we want to work with. They are listed in the `/dev/input` directory as `event1`, `event2`, `event3` etc., and the easiest way to find the one we need is to run the `evtest` utility:
+```
+# evtest
+```
+The utility will print a list of devices, by selecting one of them, we can get reports by pressing buttons on the selected input device.
+
+So we can find that the device **AT Translated Set 2 keyboard** is listed as `/dev/input/event3` on the ThinkPad T14 Gen 3, but note that most ThinkPad keyboards work as two separate input devices: **AT Translated Set 2 keyboard** and **ThinkPad Extra Buttons**. So, the **AT Translated Set 2 keyboard** works like a typical keyboard, and the **ThinkPad Extra Buttons** represents functions that are available in combination with the `Fn` button, such as sleep mode (`Fn + 4`) and screenshot (`Fn + S`). For a deeper experience, we'll work with the **ThinkPad Extra Buttons** (`/dev/input/event4`).
