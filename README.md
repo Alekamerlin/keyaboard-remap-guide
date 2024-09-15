@@ -131,3 +131,27 @@ E: KEYBOARD_KEY_46=menu
 We can also check the remap using the `evtest` utility.
 
 Next, it's best to reboot the system because X11 and Wayland may not see you changes until the reboot. After rebooting, it's best to check the remap in [`xev`](https://archlinux.org/packages/extra/x86_64/xorg-xev/) for X11 or [`wev`](https://archlinux.org/packages/extra/x86_64/wev/) for Wayland, because display servers have their own understanding of **keycodes**, and things can go wrong.
+
+### Troubleshooting
+
+The display server may identify some **keycodes** incorrectly because the **XKB** (from the `libxkbcommon` package) has its own understanding of **keycodes**. In `/usr/share/X11/xkb/keycodes/evdev` you can find translations from `evdev` **keycodes** (**scancodes**) to the `xfree86` variant.
+
+So the `KEY_MENU` **keycode** from the example above is indentified as `XF86MenuKB` but not as `Menu`, and thus doesn't open a context menu in the **GUI**. In this case, it's better to check the `/usr/share/X11/xkb/keycodes/evdev` file and look at the aliases, where we can find the alias for our `Menu`:
+```
+alias <MENU> = <COMP>;
+```
+Which means the `Comp` **keycode** works as `Menu` and looking below we can find another one alias:
+```
+alias <I135> = <COMP>;	// #define KEY_COMPOSE             127
+```
+At the end of the line, the comment tells us the `KEY_COMPOSE` **keycode**, and looking in the `/usr/include/linux/input-event-codes.h` file, we can find the same code:
+```
+#define KEY_COMPOSE		127
+```
+So using the `KEY_COMPOSE` **keycode**:
+```
+# echo -e 'evdev:name:ThinkPad Extra Buttons:dmi:bvn*:bvr*:bd*:svnLENOVO*:pn*:*\n KEYBOARD_KEY_46=compose' > /etc/udev/hwdb.d/90-remap.hwdb
+```
+solves the problem, but yeah, it's super unfriendly and not unintuitive.
+
+Alternatively, you can try configure **XKB**.
