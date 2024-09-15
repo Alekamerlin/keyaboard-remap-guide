@@ -39,3 +39,7 @@ Event: time 1726200548.302363, type 1 (EV_KEY), code 149 (KEY_PROG2), value 0
 Event: time 1726200548.302363, -------------- SYN_REPORT ------------
 ```
 Here we need to look at the value of `MSC_SCAN` and as you can see the value of combination `Fn + PrtScr` is `46` and the **scancode** is `KEY_PROG2`. Thus, we found out that the **scancode** `46` of the `PrtScr` button of the **ThinkPad Extra Buttons** is mapped as the `KEY_PROG2` **keycode**.
+
+#### 3. Find the right keycode
+
+So we already know the right **scancode** and the next step is to find the right **keycode**. A better way is to look at the default Linux **keycodes** in the `/usr/include/linux/input-event-codes.h` file. Here we have to look at the `KEY_*` definitions and for our example the variants are: `KEY_MENU`, `KEY_CONTEXT_MENU`, `KEY_ROOT_MENU`, `KEY_MEDIA_TOP_MENU`, `KEY_BRIGHTNESS_MENU`, `KEY_KBD_LCD_MENU1`, `KEY_KBD_LCD_MENU2`, `KEY_KBD_LCD_MENU3`, `KEY_KBD_LCD_MENU4` and `KEY_KBD_LCD_MENU5`. The `KEY_MENU` and `KEY_CONTEXT_MENU` **keycodes** look right ones, but we can be determine which one will work by trying them. In order, not to waste time the right **keycode** for our example is `KEY_MENU`.
